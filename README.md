@@ -1,44 +1,26 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+An online card game, Terraforming Cards
 
-## Available Scripts
+## Rules
+A 10-15 minute TM game for 2-7 players designed by me!
 
-In the project directory, you can run:
+Use two standard decks of playing cards including the jokers.
+Lay out one 10 of each suit to seed the parameter piles. Shuffle the rest of the cards.
+Next to each 10 deal out the playout deck of nine cards for clubs/water, fourteen for hearts/oxygen, fifteen for diamonds/venus, nineteen for spades/heat.
+Deal four cards to each player. The remaining cards are the supply.
+On your turn, play one card and then draw accordingly.
 
-### `yarn start`
+Numeric cards are 2-10.
+Play them on the matching suit pile such that the number of cards in that pile can be easily counted.
+Draw from that playout deck the lesser of the rank of that card, or the number of cards in that pile. The number of cards in that pile includes the seed 10, aces, kings, and the card just played.
+If the playout deck runs out, you may complete your draw, if any, from the supply. No more numeric cards of that suite may be played.
+When the last playout deck runs out, finish the draw, if any, from the supply and the game ends. Whoever has the most cards in hand wins.
+In the rare circumstances if any player cannot play a card on their turn, they may show their hand to prove it, and the game ends then. Whoever has the most cards in hand wins.
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+Non-numerics cards are jacks, queens, kings, aces, jokers.
+When you play a non-numeric card, draw one card from the supply.
+Jacks are played in front of you. Whenever you play a numeric card of that suit, also draw one card from the supply.
+Queens are played in front of you. Whenever anyone else (not you) plays a numeric card of that suit, draw one card from the supply.
+Kings are played on their matching suits. Play them such that they are offset and oriented toward their player to show ownership. At the end of the game, any previous cards between the king and the seed 10 (or a previous king) go into the king's owner's hand. (Leave the seed 10s out so you can quickly start another game.)
+Aces are played on their matching suits. They may be played as a numeric card on your turn. You may also play any number of aces as non-numeric cards after you have drawn cards. (Draw one card from supply per ace and they do not trigger jacks or queens.)
+Jokers when played are removed from the game along with any other card.
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
-
-### `yarn test`
-
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `yarn build`
-
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `yarn eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).

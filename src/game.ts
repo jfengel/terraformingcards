@@ -1,8 +1,16 @@
-import {Game, Ctx} from "boardgame.io";
+import {Game, Ctx, PlayerID} from "boardgame.io";
 
 type Card = {value : string | number, suit : string}
-type Tableau = {[p: string]: Card[]}
-type GameState = {tableau : Tableau,
+type PlayedCard = Card & {player : PlayerID | null}
+type Tableau = {
+    clubs: {pile : PlayedCard[], available : Card[]},
+    diamonds: {pile : PlayedCard[], available : Card[]},
+    hearts: {pile : PlayedCard[], available : Card[]},
+    spades: {pile : PlayedCard[], available : Card[]},
+    special : PlayedCard[]
+}
+export type GameState = {tableau : Tableau,
+    players : Player[],
     supply: Card[],
 }
 type Player = {hand : Card[]}
@@ -11,21 +19,19 @@ export default {
     setup: (ctx : Ctx) => {
         // Note the missing 10
         const deck : Card[] = ['A', 2, 3, 4, 5, 6, 7, 8, 9, 'J', 'Q', 'K'].flatMap(
-            value => ['♣', '♦', '♥', '♠'].map(
+            value => ['clubs', 'diamonds', 'hearts', 'spades'].map(
                 suit => ({value, suit})
         ));
         Array(4).forEach(
             _ => deck.push({value: 'Joker', suit: ''}))
         const supply = ctx.random?.Shuffle([...deck, ...deck])!;
-        const board : Tableau = Object.fromEntries(
-            ['♣', '♦', '♥', '♠'].map(suit =>
-            [suit, [{suit, value:10}]])
-        )
-        // nine cards for clubs/water, fourteen for hearts/oxygen, fifteen for diamonds/venus, nineteen for spades/heat
-        Array(9).fill(0).forEach(_ => board['♣'].push(supply.pop()!));
-        Array(14).fill(0).forEach(_ => board['♥'].push(supply.pop()!));
-        Array(15).fill(0).forEach(_ => board['♦'].push(supply.pop()!));
-        Array(19).fill(0).forEach(_ => board['♠'].push(supply.pop()!));
+        const tableau : Tableau = {
+            clubs : {pile : [{suit : 'clubs', value:10, player: null}], available : supply.splice(0, 9)},
+            diamonds : {pile : [{suit : 'diamonds', value:10, player: null}], available : supply.splice(0, 15)},
+            hearts : {pile : [{suit : 'hearts', value:10, player: null}], available : supply.splice(0, 14)},
+            spades : {pile : [{suit : 'spades', value:10, player: null}], available : supply.splice(0, 19)},
+            special : []
+        }
 
         const players : Player[] = [];
         for(let i = 0; i < ctx.numPlayers; i++) {
@@ -35,7 +41,7 @@ export default {
         }
         return {supply,
             players,
-            board};
+            tableau};
     },
 
     moves: {

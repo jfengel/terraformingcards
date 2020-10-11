@@ -1,4 +1,4 @@
-import {Game, Ctx, PlayerID} from "boardgame.io";
+import {Ctx, PlayerID} from "boardgame.io";
 
 export enum Suit {Clubs='clubs', Diamonds='diamonds', Hearts='hearts', Spades='spades'}
 export type Card = {value : string | number, suit : Suit | null}
@@ -17,6 +17,9 @@ export type GameState = {tableau : Tableau,
 type Player = {hand : Card[]}
 
 export default {
+    turn : {
+        moveLimit: 1,
+    },
     setup: (ctx : Ctx) => {
         // Note the missing 10
         const deck : Card[] = ['A', 2, 3, 4, 5, 6, 7, 8, 9, 'J', 'Q', 'K'].flatMap(
@@ -46,11 +49,14 @@ export default {
     },
 
     moves: {
-        play: (G : Game<GameState>, ctx : Ctx, card : Card) => {
-            console.info('G', G);
+        play: (G : GameState, ctx : Ctx, card : Card) => {
+            // console.info('moves', G.moves);
+            console.info('tableau', (G).tableau);
+            console.info('players', (G).players);
             console.info('ctx', ctx);
             console.info('card', card);
             // G.cells[id] = ctx.currentPlayer;
+            G.players[ctx.playOrderPos].hand.pop();
         },
     },
 };

@@ -1,6 +1,7 @@
 import {Game, Ctx, PlayerID} from "boardgame.io";
 
-type Card = {value : string | number, suit : string}
+enum Suit {Clubs='clubs', Diamonds='diamonds', Hearts='hearts', Spades='spades'}
+type Card = {value : string | number, suit : Suit | null}
 type PlayedCard = Card & {player : PlayerID | null}
 type Tableau = {
     clubs: {pile : PlayedCard[], available : Card[]},
@@ -19,17 +20,17 @@ export default {
     setup: (ctx : Ctx) => {
         // Note the missing 10
         const deck : Card[] = ['A', 2, 3, 4, 5, 6, 7, 8, 9, 'J', 'Q', 'K'].flatMap(
-            value => ['clubs', 'diamonds', 'hearts', 'spades'].map(
+            value => [Suit.Clubs, Suit.Diamonds, Suit.Hearts, Suit.Spades].map(
                 suit => ({value, suit})
         ));
         Array(4).forEach(
-            _ => deck.push({value: 'Joker', suit: ''}))
+            _ => deck.push({value: 'Joker', suit: null}))
         const supply = ctx.random?.Shuffle([...deck, ...deck])!;
         const tableau : Tableau = {
-            clubs : {pile : [{suit : 'clubs', value:10, player: null}], available : supply.splice(0, 9)},
-            diamonds : {pile : [{suit : 'diamonds', value:10, player: null}], available : supply.splice(0, 15)},
-            hearts : {pile : [{suit : 'hearts', value:10, player: null}], available : supply.splice(0, 14)},
-            spades : {pile : [{suit : 'spades', value:10, player: null}], available : supply.splice(0, 19)},
+            clubs : {pile : [{suit : Suit.Clubs, value:10, player: null}], available : supply.splice(0, 9)},
+            diamonds : {pile : [{suit : Suit.Diamonds, value:10, player: null}], available : supply.splice(0, 15)},
+            hearts : {pile : [{suit : Suit.Hearts, value:10, player: null}], available : supply.splice(0, 14)},
+            spades : {pile : [{suit : Suit.Spades, value:10, player: null}], available : supply.splice(0, 19)},
             special : []
         }
 

@@ -7,10 +7,12 @@ import {Local} from "boardgame.io/multiplayer";
 import React from "react";
 
 const multiplayer = Local();
-const View = Client({ game, board})
+const View = Client({ game, board, multiplayer})
 
-const App = () =>
+const App = () => <div>
     <View playerID="0"/>
+    <View playerID="1"/>
+</div>
 
 
 export default App;

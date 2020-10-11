@@ -1,9 +1,9 @@
 import {Game, Ctx, PlayerID} from "boardgame.io";
 
-enum Suit {Clubs='clubs', Diamonds='diamonds', Hearts='hearts', Spades='spades'}
-type Card = {value : string | number, suit : Suit | null}
-type PlayedCard = Card & {player : PlayerID | null}
-type Tableau = {
+export enum Suit {Clubs='clubs', Diamonds='diamonds', Hearts='hearts', Spades='spades'}
+export type Card = {value : string | number, suit : Suit | null}
+export type PlayedCard = Card & {player : PlayerID | null}
+export type Tableau = {
     clubs: {pile : PlayedCard[], available : Card[]},
     diamonds: {pile : PlayedCard[], available : Card[]},
     hearts: {pile : PlayedCard[], available : Card[]},

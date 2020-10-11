@@ -1,5 +1,5 @@
 import { Client } from 'boardgame.io/client';
-import game, {GameState} from './game';
+import game, {GameState, Suit} from './game';
 
 it('should set up the game', () => {
     // set up a specific board scenario
@@ -26,5 +26,5 @@ it('should set up the game', () => {
     expect(G.tableau.hearts.pile[0].value).toBe(10);
 
     expect(G.supply.length).toBe(31);
-    expect(G.supply[0]).toEqual({value: 9, suit: 'spades'});
+    expect(G.supply[0]).toEqual({value: 9, suit: Suit.Spades});
 });

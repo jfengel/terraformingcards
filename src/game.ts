@@ -49,14 +49,23 @@ export default {
     },
 
     moves: {
-        play: (G : GameState, ctx : Ctx, card : Card) => {
+        play: (G : GameState, ctx : Ctx, card : Card, suit : Suit) => {
             // console.info('moves', G.moves);
             console.info('tableau', (G).tableau);
-            console.info('players', (G).players);
-            console.info('ctx', ctx);
             console.info('card', card);
-            // G.cells[id] = ctx.currentPlayer;
-            G.players[ctx.playOrderPos].hand.pop();
+            console.info('suit', suit);
+
+            console.info('hand before', G.players[ctx.playOrderPos].hand);
+            G.players[ctx.playOrderPos].hand =
+                G.players[ctx.playOrderPos].hand.filter(x => !(card.value === x.value && card.suit === x.suit))
+            console.info('hand after', G.players[ctx.playOrderPos].hand);
+            const playerCard = {...card, player : ctx.currentPlayer};
+            if(suit) {
+                G.tableau[suit].pile.push(playerCard);
+            } else {
+                G.tableau.special.push(playerCard)
+            }
+
         },
     },
 };

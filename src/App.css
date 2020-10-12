@@ -1,38 +1,40 @@
-.App {
-  text-align: center;
+.waitingPlayer {
+  background-color: gray;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.activePlayer {
+  background-color: green;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.activePlayer .hand .card {
+  background-color: yellow;
+  cursor: pointer;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.activePlayer .hand .card:hover {
+  background-color: cyan;
 }
 
-.App-link {
-  color: #61dafb;
+.waitingPlayer .hand .card  {
+  background-color: lightyellow;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.selectedCard {
+  background-color: mediumpurple !important;
+}
+
+.noCardSelected .destination {
+  display: none;
+}
+.cardSelected .destination {
+  background-color: yellow;
+}
+
+.cardSelected .jacksAndQueens, .cardSelected .destination {
+  min-width: 100px;
+  display: inline-block;
+}
+
+.jackOrQueenSelected .jacksAndQueens {
+  background-color: yellow;
 }

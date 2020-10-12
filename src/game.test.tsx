@@ -25,6 +25,6 @@ it('should set up the game', () => {
     expect(G.tableau.diamonds.available.length).toBe(15);
     expect(G.tableau.hearts.pile[0].value).toBe(10);
 
-    expect(G.supply.length).toBe(31);
-    expect(G.supply[0]).toEqual({value: 9, suit: Suit.Spades, deck : 2});
+    expect(G.supply.length).toBe(35);
+    expect(G.supply[0]).toEqual({value: 9, suit: Suit.Diamonds, deck : 2});
 });

@@ -35,8 +35,8 @@ export default {
                 value => [Suit.Clubs, Suit.Diamonds, Suit.Hearts, Suit.Spades].map(
                     suit => ({value, suit, deck})
                 ));
-            Array(4).forEach(
-                _ => cards.push({value: 'Joker', suit: null, deck}))
+            cards.push({value: '🃏', suit: null, deck})
+            cards.push({value: '🃟', suit: null, deck})
             return cards;
         })
         const supply = ctx.random?.Shuffle(deck)!;
@@ -60,19 +60,15 @@ export default {
     },
 
     moves: {
-        play: (G : GameState, ctx : Ctx, card : Card, suit : Suit) => {
-            // console.info('moves', G.moves);
-            console.info('tableau', (G).tableau);
-            console.info('card', card);
-            console.info('suit', suit);
-
+        play: (G : GameState, ctx : Ctx, card : Card) => {
             console.info('hand before', G.players[ctx.playOrderPos].hand);
             G.players[ctx.playOrderPos].hand =
                 G.players[ctx.playOrderPos].hand.filter(x => !sameCard(x, card))
             console.info('hand after', G.players[ctx.playOrderPos].hand);
             const playerCard = {...card, player : ctx.currentPlayer};
-            if(suit) {
-                G.tableau[suit].pile.push(playerCard);
+            if(card.value >= 2 && card.value <= 9) {
+                G.tableau[card.suit!].pile.push(playerCard);
+                // Draw from that playout deck the lesser of the rank of that card, or the number of cards in that pile.
             } else {
                 G.tableau.special.push(playerCard)
             }

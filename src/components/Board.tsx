@@ -19,7 +19,9 @@ export default ({G, moves, ctx, playerID} : {G : GameState, moves : any, ctx : C
     const PlayingCard = ({card, onClick}:
                          { card: Card,
                              onClick? : (_ : Card ) => void }) =>
-        <span className={"card" + ((selectedCard && selectedCard === card) ? " selectedCard" : "")}
+        <span className={"card"
+            + (onClick ? " selectable" : "")
+            + ((selectedCard && selectedCard === card) ? " selectedCard" : "")}
               onClick={onClick && (_ => onClick(card))}>
             {card.value}
             {card.suit && suitMap[card.suit]}
@@ -75,7 +77,10 @@ export default ({G, moves, ctx, playerID} : {G : GameState, moves : any, ctx : C
             <p>Me ({playerID})</p>
             <div className="hand">
                 {G.players[ctx.playOrder.indexOf(playerID)].hand.map((card, i) =>
-                    <PlayingCard card={card} key={i} onClick={setSelectedCard}/>)}
+                    <PlayingCard card={card} key={i}
+                            // If the playout deck runs out, you may complete your draw, if any, from the supply.
+                            // No more numeric cards of that suite may be played.
+                            onClick={!card.suit || G.tableau[card.suit!].available.length > 0 ? setSelectedCard : undefined}/>)}
             </div>
         </div>
 

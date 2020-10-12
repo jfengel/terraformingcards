@@ -68,7 +68,14 @@ export default {
             if(typeof card.value === 'number') {
                 tableau.pile.push(playerCard);
                 // Draw from that playout deck the lesser of the rank of that card, or the number of cards in that pile.
-                G.players[ctx.playOrderPos].hand.push(...tableau.available.splice(0, card.value))
+                const draw = tableau.available.splice(0, card.value);
+                // If the playout deck runs out, you may complete your draw, if any, from the supply.
+                const extra = card.value - draw.length;
+                if(extra > 0) {
+                    const more = G.supply.splice(0, extra);
+                    more.forEach(x => draw.push(x))
+                }
+                G.players[ctx.playOrderPos].hand.push(...draw)
             } else {
                 G.tableau.special.push(playerCard)
             }

@@ -16,9 +16,11 @@ export default ({G, moves, ctx, playerID} : {G : GameState, moves : any, ctx : C
         setSelectedCard(undefined);
     }
 
-    const PlayingCard = ({card}: { card: Card }) =>
+    const PlayingCard = ({card, onClick}:
+                         { card: Card,
+                             onClick? : (_ : Card ) => void }) =>
         <span className={"card" + ((selectedCard && selectedCard === card) ? " selectedCard" : "")}
-              onClick={_ => setSelectedCard(card)}>
+              onClick={onClick && (_ => onClick(card))}>
             {card.value}
             {card.suit && suitMap[card.suit]}
     </span>
@@ -72,7 +74,8 @@ export default ({G, moves, ctx, playerID} : {G : GameState, moves : any, ctx : C
         <div>
             <p>Me ({playerID})</p>
             <div className="hand">
-                {G.players[ctx.playOrder.indexOf(playerID)].hand.map((card, i) => <PlayingCard card={card} key={i}/>)}
+                {G.players[ctx.playOrder.indexOf(playerID)].hand.map((card, i) =>
+                    <PlayingCard card={card} key={i} onClick={setSelectedCard}/>)}
             </div>
         </div>
 

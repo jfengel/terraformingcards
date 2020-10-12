@@ -61,14 +61,14 @@ export default {
 
     moves: {
         play: (G : GameState, ctx : Ctx, card : Card) => {
-            console.info('hand before', G.players[ctx.playOrderPos].hand);
             G.players[ctx.playOrderPos].hand =
                 G.players[ctx.playOrderPos].hand.filter(x => !sameCard(x, card))
-            console.info('hand after', G.players[ctx.playOrderPos].hand);
             const playerCard = {...card, player : ctx.currentPlayer};
-            if(card.value >= 2 && card.value <= 9) {
-                G.tableau[card.suit!].pile.push(playerCard);
+            const tableau = G.tableau[card.suit!];
+            if(typeof card.value === 'number') {
+                tableau.pile.push(playerCard);
                 // Draw from that playout deck the lesser of the rank of that card, or the number of cards in that pile.
+                G.players[ctx.playOrderPos].hand.push(...tableau.available.splice(0, card.value))
             } else {
                 G.tableau.special.push(playerCard)
             }

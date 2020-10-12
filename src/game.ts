@@ -62,7 +62,7 @@ export default {
         play: (G : GameState, ctx : Ctx, card : Card) => {
             const player = G.players[ctx.playOrderPos];
 
-            function draw(n : number = 1) {
+            function draw(player : Player, n : number = 1) {
                 const draw = G.supply.splice(0, n);
                 player.hand.push(...draw)
             }
@@ -80,20 +80,30 @@ export default {
                 player.hand.push(...cards)
                 const extra = playout - cards.length;
                 if(extra > 0) {
-                    draw(extra);
+                    draw(player, extra);
                 }
                 // Jacks are played in front of you.
                 // Whenever you play a numeric card of that suit, also draw one card from the supply.
                 player.special.forEach(special => {
                     if (special.value === 'J' && card.suit === special.suit) {
-                        draw(1);
+                        draw(player, 1);
                     }
                 })
+                // Queens are played in front of you.
+                // Whenever anyone else (not you) plays a numeric card of that suit, draw one card from the supply.
+                G.players
+                    .filter((_, i) => i !== ctx.playOrderPos)
+                    .forEach((player => {
+                        player.special.forEach(c => {
+                            if(c.value === 'Q' && c.suit === card.suit) {
+                                draw(player, 1);
+                            }
+                        })
+                    }))
             } else {
                 player.special.push(playerCard)
                 // When you play a non-numeric card, draw one card from the supply.
-                draw(1);
-
+                draw(player, 1);
             }
 
         },

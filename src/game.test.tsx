@@ -34,3 +34,6 @@ expect(initials('Joshua', ['Alan', 'Joshua'])).toEqual('J');
 expect(initials('Joshua', ['Alan', 'James'])).toEqual('Jo');
 expect(initials('Joshua', ['Alan', 'John'])).toEqual('Ja');
 expect(initials('Joshua Engel', ['Alan', 'John'])).toEqual('JE');
+expect(initials('Joshua Engel', ['Alan', 'John Engel'])).toEqual('Joshua');
+expect(initials('John Smith', ['Alan', 'John Smyth'])).toEqual('Smith');
+

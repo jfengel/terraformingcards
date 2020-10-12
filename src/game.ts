@@ -23,10 +23,66 @@ function sameCard(x: Card, y: Card) {
     return y.value === x.value && y.suit === x.suit && y.deck === x.deck;
 }
 
+export const PLAYING_ACES = 'PlayingAces';
+
+let playCard = (G : GameState, ctx : Ctx, card : Card) => {
+    const player = G.players[ctx.playOrderPos];
+
+    function draw(player : Player, n : number = 1) {
+        const draw = G.supply.splice(0, n);
+        player.hand.push(...draw)
+    }
+
+    player.hand =
+        player.hand.filter(x => !sameCard(x, card))
+    const playerCard = {...card, player : ctx.currentPlayer};
+    const tableau = G.tableau[card.suit!];
+    if(typeof card.value === 'number') {
+        tableau.pile.push(playerCard);
+        // Draw from that playout deck the lesser of the rank of that card, or the number of cards in that pile.
+        const playout = Math.min(card.value, tableau.pile.length);
+        const cards = tableau.available.splice(0, playout);
+        // If the playout deck runs out, you may complete your draw, if any, from the supply.
+        player.hand.push(...cards)
+        const extra = playout - cards.length;
+        if (extra > 0) {
+            draw(player, extra);
+        }
+        // Jacks are played in front of you.
+        // Whenever you play a numeric card of that suit, also draw one card from the supply.
+        player.special.forEach(special => {
+            if (special.value === 'J' && card.suit === special.suit) {
+                draw(player, 1);
+            }
+        })
+        // Queens are played in front of you.
+        // Whenever anyone else (not you) plays a numeric card of that suit, draw one card from the supply.
+        G.players
+            .filter((_, i) => i !== ctx.playOrderPos)
+            .forEach((player => {
+                player.special.forEach(c => {
+                    if (c.value === 'Q' && c.suit === card.suit) {
+                        draw(player, 1);
+                    }
+                })
+            }))
+    } else if(card.value === 'A') {
+        // Aces are played on their matching suits. They may be played as a numeric card on your turn.
+        tableau.pile.push(playerCard);
+        // Draw one card from supply per ace and they do not trigger jacks or queens.
+        draw(player, 1);
+    } else {
+        player.special.push(playerCard)
+        // When you play a non-numeric card, draw one card from the supply.
+        draw(player, 1);
+    }
+    if(player.hand.find(card => card.value === 'A')) {
+        ctx.events?.setStage!(PLAYING_ACES)
+    } else {
+        ctx.events?.endTurn!()
+    }
+};
 export default {
-    turn : {
-        moveLimit: 1,
-    },
     setup: (ctx : Ctx) => {
         const deck = [1, 2].flatMap(deck => {
             // Note the missing 10
@@ -57,55 +113,19 @@ export default {
             players,
             tableau};
     },
+    turn: {
+        stages: {
+            discard: {
+                moves: { playCard },
+            },
+        },
+    },
 
     moves: {
-        play: (G : GameState, ctx : Ctx, card : Card) => {
-            const player = G.players[ctx.playOrderPos];
-
-            function draw(player : Player, n : number = 1) {
-                const draw = G.supply.splice(0, n);
-                player.hand.push(...draw)
-            }
-
-            player.hand =
-                player.hand.filter(x => !sameCard(x, card))
-            const playerCard = {...card, player : ctx.currentPlayer};
-            const tableau = G.tableau[card.suit!];
-            if(typeof card.value === 'number') {
-                tableau.pile.push(playerCard);
-                // Draw from that playout deck the lesser of the rank of that card, or the number of cards in that pile.
-                const playout = Math.min(card.value, tableau.pile.length);
-                const cards = tableau.available.splice(0, playout);
-                // If the playout deck runs out, you may complete your draw, if any, from the supply.
-                player.hand.push(...cards)
-                const extra = playout - cards.length;
-                if(extra > 0) {
-                    draw(player, extra);
-                }
-                // Jacks are played in front of you.
-                // Whenever you play a numeric card of that suit, also draw one card from the supply.
-                player.special.forEach(special => {
-                    if (special.value === 'J' && card.suit === special.suit) {
-                        draw(player, 1);
-                    }
-                })
-                // Queens are played in front of you.
-                // Whenever anyone else (not you) plays a numeric card of that suit, draw one card from the supply.
-                G.players
-                    .filter((_, i) => i !== ctx.playOrderPos)
-                    .forEach((player => {
-                        player.special.forEach(c => {
-                            if(c.value === 'Q' && c.suit === card.suit) {
-                                draw(player, 1);
-                            }
-                        })
-                    }))
-            } else {
-                player.special.push(playerCard)
-                // When you play a non-numeric card, draw one card from the supply.
-                draw(player, 1);
-            }
-
+        endTurn: (G : GameState, ctx : Ctx) => {
+            ctx.events?.endStage!()
+            ctx.events?.endTurn!();
         },
+        play: playCard,
     },
 };

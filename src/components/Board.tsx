@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Card, GameState, Suit, Cards} from "../game";
+import {Card, GameState, Suit, Cards, PLAYING_ACES} from "../game";
 import {Ctx} from "boardgame.io";
 
 const suitMap = {
@@ -11,9 +11,18 @@ const suitMap = {
 export default ({G, moves, ctx, playerID} : {G : GameState, moves : any, ctx : Ctx, playerID : any}) => {
     const [selectedCard, setSelectedCard] = useState<Card>()
 
+    const player = G.players[ctx.playOrder.indexOf(playerID)];
+
+    const playingAces = ctx.activePlayers && ctx.activePlayers[playerID] === PLAYING_ACES;
+
     const play = (suit : Suit | null) => () => {
         moves.play(selectedCard, suit);
         setSelectedCard(undefined);
+    }
+
+    const pass = () => {
+        moves.endTurn();
+        setSelectedCard(undefined)
     }
 
     const PlayingCard = ({card, onClick}:
@@ -31,7 +40,9 @@ export default ({G, moves, ctx, playerID} : {G : GameState, moves : any, ctx : C
         <div>
             {cards.available.length}🂠&nbsp;
             {cards.pile.map((card, i) => <PlayingCard card={card} key={i}/>)}
-            <span className="destination" onClick={play(suit)}>:</span>
+            {selectedCard && selectedCard.suit === suit
+                ? <span className={"destination"} onClick={play(suit)}>:</span>
+                : null}
         </div>
 
     const classes = [ctx.currentPlayer === playerID ? "activePlayer" : "waitingPlayer"]
@@ -42,14 +53,13 @@ export default ({G, moves, ctx, playerID} : {G : GameState, moves : any, ctx : C
     else
         classes.push('cardSelected');
 
-    const player = G.players[ctx.playOrder.indexOf(playerID)];
     return <div className={classes.join(' ')}>
         <div>
             Cards remaining: {G.supply.length}
+            ActivePlayers: {JSON.stringify(ctx.activePlayers)}
+        </div>
+        <div>
             Current player: {ctx.currentPlayer}
-            PLayOrderPos : {ctx.playOrderPos}
-            ActivePlayers: {ctx.activePlayers}
-            PlayOrder : {ctx.playOrder}
         </div>
         <table>
             <tbody>
@@ -81,8 +91,16 @@ export default ({G, moves, ctx, playerID} : {G : GameState, moves : any, ctx : C
                     <PlayingCard card={card} key={i}
                             // If the playout deck runs out, you may complete your draw, if any, from the supply.
                             // No more numeric cards of that suite may be played.
-                            onClick={!card.suit || G.tableau[card.suit!].available.length > 0 ? setSelectedCard : undefined}/>)}
+                            onClick={!card.suit
+                                || G.tableau[card.suit!].available.length > 0
+                                || (playingAces && card.value === 'A')
+                                ? setSelectedCard
+                                : undefined}/>)}
             </div>
+            {playingAces
+                ? <button onClick={pass}>Click when done playing aces</button>
+                : null
+            }
         </div>
 
     </div>

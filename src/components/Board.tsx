@@ -42,6 +42,7 @@ export default ({G, moves, ctx, playerID} : {G : GameState, moves : any, ctx : C
     else
         classes.push('cardSelected');
 
+    const player = G.players[ctx.playOrder.indexOf(playerID)];
     return <div className={classes.join(' ')}>
         <div>
             Cards remaining: {G.supply.length}
@@ -66,7 +67,7 @@ export default ({G, moves, ctx, playerID} : {G : GameState, moves : any, ctx : C
                     <Pile suit={Suit.Spades} cards={G.tableau.spades}/>
                     <div className='jacksAndQueens' onClick={play(null)}>
                         :
-                        {G.tableau.special.map((card, i) => <PlayingCard card={card} key={i}/>)}
+                        {player.special.map((card, i) => <PlayingCard card={card} key={i}/>)}
                     </div>
                 </td>
                 <td/>
@@ -76,7 +77,7 @@ export default ({G, moves, ctx, playerID} : {G : GameState, moves : any, ctx : C
         <div>
             <p>Me ({playerID})</p>
             <div className="hand">
-                {G.players[ctx.playOrder.indexOf(playerID)].hand.map((card, i) =>
+                {player.hand.map((card, i) =>
                     <PlayingCard card={card} key={i}
                             // If the playout deck runs out, you may complete your draw, if any, from the supply.
                             // No more numeric cards of that suite may be played.

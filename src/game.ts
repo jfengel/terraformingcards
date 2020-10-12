@@ -12,13 +12,12 @@ export type Tableau = {
     diamonds: Cards,
     hearts: Cards,
     spades: Cards,
-    special : PlayedCard[]
 }
 export type GameState = {tableau : Tableau,
     players : Player[],
     supply: Card[],
 }
-type Player = {hand : Card[]}
+type Player = {hand : Card[], special : Card[]}
 
 function sameCard(x: Card, y: Card) {
     return y.value === x.value && y.suit === x.suit && y.deck === x.deck;
@@ -45,13 +44,13 @@ export default {
             diamonds : {pile : [{suit : Suit.Diamonds, value:10, player: null, deck : 1}], available : supply.splice(0, 15)},
             hearts : {pile : [{suit : Suit.Hearts, value:10, player: null, deck : 1}], available : supply.splice(0, 14)},
             spades : {pile : [{suit : Suit.Spades, value:10, player: null, deck : 1}], available : supply.splice(0, 19)},
-            special : []
         }
 
         const players : Player[] = [];
         for(let i = 0; i < ctx.numPlayers; i++) {
             players.push({
-                hand : supply.splice(0, 4)
+                hand : supply.splice(0, 4),
+                special : []
             })
         }
         return {supply,
@@ -61,23 +60,40 @@ export default {
 
     moves: {
         play: (G : GameState, ctx : Ctx, card : Card) => {
-            G.players[ctx.playOrderPos].hand =
-                G.players[ctx.playOrderPos].hand.filter(x => !sameCard(x, card))
+            const player = G.players[ctx.playOrderPos];
+
+            function draw(n : number = 1) {
+                const draw = G.supply.splice(0, n);
+                player.hand.push(...draw)
+            }
+
+            player.hand =
+                player.hand.filter(x => !sameCard(x, card))
             const playerCard = {...card, player : ctx.currentPlayer};
             const tableau = G.tableau[card.suit!];
             if(typeof card.value === 'number') {
                 tableau.pile.push(playerCard);
                 // Draw from that playout deck the lesser of the rank of that card, or the number of cards in that pile.
-                const draw = tableau.available.splice(0, card.value);
+                const playout = Math.min(card.value, tableau.pile.length);
+                const cards = tableau.available.splice(0, playout);
                 // If the playout deck runs out, you may complete your draw, if any, from the supply.
-                const extra = card.value - draw.length;
+                player.hand.push(...cards)
+                const extra = playout - cards.length;
                 if(extra > 0) {
-                    const more = G.supply.splice(0, extra);
-                    more.forEach(x => draw.push(x))
+                    draw(extra);
                 }
-                G.players[ctx.playOrderPos].hand.push(...draw)
+                // Jacks are played in front of you.
+                // Whenever you play a numeric card of that suit, also draw one card from the supply.
+                player.special.forEach(special => {
+                    if (special.value === 'J' && card.suit === special.suit) {
+                        draw(1);
+                    }
+                })
             } else {
-                G.tableau.special.push(playerCard)
+                player.special.push(playerCard)
+                // When you play a non-numeric card, draw one card from the supply.
+                draw(1);
+
             }
 
         },

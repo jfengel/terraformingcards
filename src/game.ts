@@ -6,11 +6,12 @@ export type Card = {
     suit : Suit | null,
     deck : number}
 export type PlayedCard = Card & {player : PlayerID | null}
+export type Cards = { pile: PlayedCard[], available: Card[] };
 export type Tableau = {
-    clubs: {pile : PlayedCard[], available : Card[]},
-    diamonds: {pile : PlayedCard[], available : Card[]},
-    hearts: {pile : PlayedCard[], available : Card[]},
-    spades: {pile : PlayedCard[], available : Card[]},
+    clubs: Cards,
+    diamonds: Cards,
+    hearts: Cards,
+    spades: Cards,
     special : PlayedCard[]
 }
 export type GameState = {tableau : Tableau,

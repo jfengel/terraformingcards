@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Card, GameState, Suit} from "../game";
+import {Card, GameState, Suit, Cards} from "../game";
 import {Ctx} from "boardgame.io";
 
 const suitMap = {
@@ -22,6 +22,13 @@ export default ({G, moves, ctx, playerID} : {G : GameState, moves : any, ctx : C
             {card.value}
             {card.suit && suitMap[card.suit]}
     </span>
+
+    const Pile = ({cards, suit} : {cards : Cards, suit: Suit}) =>
+        <div>
+            {cards.available.length}🂠&nbsp;
+            {cards.pile.map((card, i) => <PlayingCard card={card} key={i}/>)}
+            <span className="destination" onClick={play(suit)}>:</span>
+        </div>
 
     const classes = [ctx.currentPlayer === playerID ? "activePlayer" : "waitingPlayer"]
     if(!selectedCard)
@@ -49,22 +56,10 @@ export default ({G, moves, ctx, playerID} : {G : GameState, moves : any, ctx : C
             <tr>
                 <td/>
                 <td>
-                    <div>
-                        <>{G.tableau.clubs.pile.map((card, i) => <PlayingCard card={card} key={i}/>)}</>
-                        <span className="destination" onClick={play(Suit.Clubs)}>:</span>
-                    </div>
-                    <div>
-                        <>{G.tableau.diamonds.pile.map((card, i) => <PlayingCard card={card} key={i}/>)}</>
-                        <span className="destination" onClick={play(Suit.Diamonds)}>:</span>
-                    </div>
-                    <div>
-                        <>{G.tableau.hearts.pile.map((card, i) => <PlayingCard card={card} key={i}/>)}</>
-                        <span className="destination" onClick={play(Suit.Hearts)}>:</span>
-                    </div>
-                    <div>
-                        <>{G.tableau.spades.pile.map((card, i) => <PlayingCard card={card} key={i}/>)}</>
-                        <span className="destination" onClick={play(Suit.Spades)}>:</span>
-                    </div>
+                    <Pile suit={Suit.Clubs} cards={G.tableau.clubs}/>
+                    <Pile suit={Suit.Diamonds} cards={G.tableau.diamonds}/>
+                    <Pile suit={Suit.Hearts} cards={G.tableau.hearts}/>
+                    <Pile suit={Suit.Spades} cards={G.tableau.spades}/>
                     <div className='jacksAndQueens' onClick={play(null)}>
                         :
                         {G.tableau.special.map((card, i) => <PlayingCard card={card} key={i}/>)}

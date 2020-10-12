@@ -19,8 +19,12 @@ In the rare circumstances if any player cannot play a card on their turn, they m
 Non-numerics cards are jacks, queens, kings, aces, jokers.
 When you play a non-numeric card, draw one card from the supply.
 Jacks are played in front of you. Whenever you play a numeric card of that suit, also draw one card from the supply.
+
 Queens are played in front of you. Whenever anyone else (not you) plays a numeric card of that suit, draw one card from the supply.
+
 Kings are played on their matching suits. Play them such that they are offset and oriented toward their player to show ownership. At the end of the game, any previous cards between the king and the seed 10 (or a previous king) go into the king's owner's hand. (Leave the seed 10s out so you can quickly start another game.)
+
 Aces are played on their matching suits. They may be played as a numeric card on your turn. You may also play any number of aces as non-numeric cards after you have drawn cards. (Draw one card from supply per ace and they do not trigger jacks or queens.)
-Jokers when played are removed from the game along with any other card.
+
+Jokers when played are removed from the game along with one other card.
 

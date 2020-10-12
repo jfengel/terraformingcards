@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Card, GameState, Suit, Cards, PLAYING_ACES} from "../game";
+import {Card, GameState, Suit, Cards, PLAYING_ACES, isJoker} from "../game";
 import {Ctx} from "boardgame.io";
 
 const suitMap = {
@@ -20,17 +20,22 @@ export default ({G, moves, ctx, playerID} : {G : GameState, moves : any, ctx : C
         setSelectedCard(undefined);
     }
 
+    const remove = (card : Card) => {
+        moves.playJoker(selectedCard, card);
+    }
+
     const pass = () => {
         moves.endTurn();
         setSelectedCard(undefined)
     }
 
-    const PlayingCard = ({card, onClick}:
-                         { card: Card,
-                             onClick? : (_ : Card ) => void }) =>
+    const PlayingCard = ({card, onClick}: {
+        card: Card,
+        onClick?: (_: Card) => void
+    }) =>
         <span className={"card"
-            + (onClick ? " selectable" : "")
-            + ((selectedCard && selectedCard === card) ? " selectedCard" : "")}
+        + (onClick ? " selectable" : "")
+        + ((selectedCard && selectedCard === card) ? " selectedCard" : "")}
               onClick={onClick && (_ => onClick(card))}>
             {card.value}
             {card.suit && suitMap[card.suit]}
@@ -39,7 +44,10 @@ export default ({G, moves, ctx, playerID} : {G : GameState, moves : any, ctx : C
     const Pile = ({cards, suit} : {cards : Cards, suit: Suit}) =>
         <div>
             {cards.available.length}🂠&nbsp;
-            {cards.pile.map((card, i) => <PlayingCard card={card} key={i}/>)}
+            {cards.pile.map((card, i) =>
+                <PlayingCard card={card}
+                             key={i}
+                             onClick={isJoker(selectedCard) ? remove : undefined}/>)}
             {selectedCard && selectedCard.suit === suit
                 ? <span className={"destination"} onClick={play(suit)}>:</span>
                 : null}
@@ -91,9 +99,10 @@ export default ({G, moves, ctx, playerID} : {G : GameState, moves : any, ctx : C
                     <PlayingCard card={card} key={i}
                             // If the playout deck runs out, you may complete your draw, if any, from the supply.
                             // No more numeric cards of that suite may be played.
-                            onClick={!card.suit
-                                || G.tableau[card.suit!].available.length > 0
-                                || (playingAces && card.value === 'A')
+                            onClick={
+                                (playingAces
+                                    ? card.value === 'A'
+                                    : (isJoker(card) || G.tableau[card.suit!].available.length > 0))
                                 ? setSelectedCard
                                 : undefined}/>)}
             </div>

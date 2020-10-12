@@ -6,12 +6,12 @@
   background-color: green;
 }
 
-.activePlayer .hand .selectable.card {
+.activePlayer .selectable.card {
   background-color: yellow;
   cursor: pointer;
 }
 
-.activePlayer .hand .selectable.card:hover {
+.activePlayer .selectable.card:hover {
   background-color: cyan;
 }
 

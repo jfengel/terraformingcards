@@ -19,13 +19,23 @@ export type GameState = {tableau : Tableau,
 }
 type Player = {hand : Card[], special : Card[]}
 
+export const isJoker = (card? : Card) => card && !card.suit
+
 function sameCard(x: Card, y: Card) {
     return y.value === x.value && y.suit === x.suit && y.deck === x.deck;
 }
 
 export const PLAYING_ACES = 'PlayingAces';
 
-let playCard = (G : GameState, ctx : Ctx, card : Card) => {
+const playJoker = (G : GameState, ctx : Ctx, joker : Card, card : Card) => {
+    const player = G.players[ctx.playOrderPos];
+    player.hand = player.hand.filter(x => !sameCard(x, joker))
+    G.tableau[card.suit!].pile =
+        G.tableau[card.suit!].pile.filter(x => !sameCard(x, card));
+    ctx.events?.endTurn!()
+}
+
+const playCard = (G : GameState, ctx : Ctx, card : Card) => {
     const player = G.players[ctx.playOrderPos];
 
     function draw(player : Player, n : number = 1) {
@@ -127,5 +137,6 @@ export default {
             ctx.events?.endTurn!();
         },
         play: playCard,
+        playJoker,
     },
 };

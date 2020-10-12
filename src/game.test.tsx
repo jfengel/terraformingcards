@@ -1,5 +1,6 @@
 import { Client } from 'boardgame.io/client';
 import game, {GameState, Suit} from './game';
+import {initials} from "./components/Board";
 
 it('should set up the game', () => {
     // set up a specific board scenario
@@ -28,3 +29,8 @@ it('should set up the game', () => {
     expect(G.supply.length).toBe(35);
     expect(G.supply[0]).toEqual({value: 9, suit: Suit.Diamonds, deck : 2});
 });
+
+expect(initials('Joshua', ['Alan', 'Joshua'])).toEqual('J');
+expect(initials('Joshua', ['Alan', 'James'])).toEqual('Jo');
+expect(initials('Joshua', ['Alan', 'John'])).toEqual('Ja');
+expect(initials('Joshua Engel', ['Alan', 'John'])).toEqual('JE');

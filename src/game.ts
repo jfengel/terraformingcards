@@ -76,7 +76,7 @@ const playCard = (G : GameState, ctx : Ctx, card : Card) => {
                     }
                 })
             }))
-    } else if(card.value === 'A') {
+    } else if(card.value === 'A' || card.value === 'K') {
         // Aces are played on their matching suits. They may be played as a numeric card on your turn.
         tableau.pile.push(playerCard);
         // Draw one card from supply per ace and they do not trigger jacks or queens.

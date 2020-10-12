@@ -18,6 +18,7 @@ In the rare circumstances if any player cannot play a card on their turn, they m
 
 Non-numerics cards are jacks, queens, kings, aces, jokers.
 When you play a non-numeric card, draw one card from the supply.
+
 Jacks are played in front of you. Whenever you play a numeric card of that suit, also draw one card from the supply.
 
 Queens are played in front of you. Whenever anyone else (not you) plays a numeric card of that suit, draw one card from the supply.

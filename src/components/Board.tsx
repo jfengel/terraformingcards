@@ -8,6 +8,25 @@ const suitMap = {
     hearts: <span style={{color: 'red'}}>♥</span>,
     spades: <span color='black'>♠</span>,
 }
+
+/* Apply several strategies to come up with a short, unique identifier */
+export const initials = (name : string, allNames : string[]) => {
+    if(!name)
+        return name;
+    const others = allNames.filter(x => name !== x);
+    const first = (x : string) => x[0];
+    const initials = (x : string) => x.split(' ').filter(x=>x).map(x => x[0]).join('');
+    const firstTwo = (x : string) => x.length < 2 ? x : x[0] + x[1];
+    const firstAndLast = (x : string) => x.length < 2 ? x : x[0] + x[x.length-1];
+    const isUnique = (x: string, ys : string[], strategy : (a : string) => string) =>
+        !ys.find(y => strategy(x) === strategy(y))
+    for(const strategy of [first, initials, firstTwo, firstAndLast]) {
+        if(isUnique(name, others, strategy))
+            return strategy(name);
+    }
+    return name;
+}
+
 export default ({G, moves, ctx, playerID} : {G : GameState, moves : any, ctx : Ctx, playerID : any}) => {
     const [selectedCard, setSelectedCard] = useState<Card>()
 
@@ -39,6 +58,7 @@ export default ({G, moves, ctx, playerID} : {G : GameState, moves : any, ctx : C
               onClick={onClick && (_ => onClick(card))}>
             {card.value}
             {card.suit && suitMap[card.suit]}
+            {card.value === 'K' ? <sup>{initials((card as any).player, ctx.playOrder)}</sup> : null }
     </span>
 
     const Pile = ({cards, suit} : {cards : Cards, suit: Suit}) =>

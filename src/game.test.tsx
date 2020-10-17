@@ -1,6 +1,6 @@
 import { Client } from 'boardgame.io/client';
 import game, {GameState, Suit} from './game';
-import {initials} from "./components/Board";
+import {initials} from "./util/initials";
 
 it('should set up the game', () => {
     // set up a specific board scenario

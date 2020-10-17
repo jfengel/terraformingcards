@@ -16,7 +16,7 @@
 }
 
 .waitingPlayer .hand .card  {
-  background-color: lightyellow;
+  background-color: lightgray;
 }
 
 .selectedCard {
@@ -42,4 +42,5 @@
 .card {
   border: black 1px solid;
   border-radius: 4px;
+  background-color: lightyellow;
 }

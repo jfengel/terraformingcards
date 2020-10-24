@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import {Card, Cards, GameState, isJoker, PLAYING_ACES, Suit} from "../game";
 import {Ctx} from "boardgame.io";
 import {initials} from "../util/initials";
+import WinnerOverlay from "./WinnerOverlay";
 
 const suitMap = {
     clubs: <span color='black'>♣</span>,
@@ -65,9 +66,9 @@ export default ({G, moves, ctx, playerID} : {G : GameState, moves : any, ctx : C
         classes.push('cardSelected');
 
     return <div className={classes.join(' ')}>
+        <WinnerOverlay ctx={ctx}/>
         <div>
             Cards remaining: {G.supply.length}
-            ActivePlayers: {JSON.stringify(ctx.activePlayers)}
         </div>
         <div>
             Current player: {ctx.currentPlayer}

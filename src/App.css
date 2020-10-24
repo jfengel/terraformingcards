@@ -44,3 +44,16 @@
   border-radius: 4px;
   background-color: lightyellow;
 }
+
+.winnerOverlay {
+  position: absolute;
+  background: ghostwhite;
+  padding: 10px;
+  border-color: yellow;
+  border-width: 4px;
+  border-style: double;
+  border-radius: 10px;
+  right: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%)
+}

@@ -35,7 +35,7 @@ const playJoker = (G : GameState, ctx : Ctx, joker : Card, card : Card) => {
     ctx.events?.endTurn!()
 }
 
-const playCard = (G : GameState, ctx : Ctx, card : Card) => {
+export const playCard = (G : GameState, ctx : Ctx, card : Card) => {
     const player = G.players[ctx.playOrderPos];
 
     function draw(player : Player, n : number = 1) {
@@ -86,12 +86,47 @@ const playCard = (G : GameState, ctx : Ctx, card : Card) => {
         // When you play a non-numeric card, draw one card from the supply.
         draw(player, 1);
     }
-    if(player.hand.find(card => card.value === 'A')) {
+    if(player.hand.find(card => card.value === 'A') && !gameOver(G)) {
+        // I don't think there's any reason to play aces at the end of the game, so this saves an action.
         ctx.events?.setStage!(PLAYING_ACES)
     } else {
         ctx.events?.endTurn!()
     }
 };
+
+export function distributeKings(t:
+                                    Tableau, ctx: Ctx, G: GameState) {
+    // At the end of the game, any previous cards between the king and the seed 10 (or a previous king)
+    // go into the king's owner's hand.
+    for (const suit of [t.clubs, t.diamonds, t.hearts, t.spades]) {
+        const firstKing = suit.pile.findIndex(card => card.value === 'K');
+        if (firstKing > 0) {
+            const secondKing = suit.pile.findIndex((card, i) => i > firstKing && card.value === 'K');
+            if (secondKing > 0) {
+                const player = suit.pile[secondKing].player;
+                const i = ctx.playOrder.indexOf(player!);
+                const betweenKings2 = suit.pile.filter((_,i) => i > firstKing && i < secondKing)
+                G.players[i].hand.push(...betweenKings2);
+            }
+            const player = suit.pile[firstKing].player;
+            const i = ctx.playOrder.indexOf(player!);
+            const betweenKings1 = suit.pile.filter((_,i) => i > 0 && i < firstKing)
+            G.players[i].hand.push(...betweenKings1);
+            // For some reason splice wasn't working on suit.pile
+            // This doesn't work either. I can modify the players but not the suits. Weird.
+            // It's not important to the final state of the game but it's odd.
+            // suit.pile = suit.pile.filter((_,i) => i === 0 || i === firstKing || (secondKing > 0 && i >= secondKing ))
+        }
+    }
+}
+
+function gameOver(G: GameState) {
+    return G.tableau.clubs.available.length === 0
+        && G.tableau.hearts.available.length === 0
+        && G.tableau.diamonds.available.length === 0
+        && G.tableau.spades.available.length === 0;
+}
+
 export default {
     setup: (ctx : Ctx) => {
         const deck = [1, 2].flatMap(deck => {
@@ -122,6 +157,23 @@ export default {
         return {supply,
             players,
             tableau};
+    },
+    endIf: (G : GameState, ctx : Ctx) => {
+        const t = G.tableau;
+        // When the last playout deck runs out, finish the draw, if any, from the supply and the game ends.
+        if(gameOver(G)) {
+            distributeKings(t, ctx, G);
+            const topScore = Math.max(...G.players.map(x => x.hand.length));
+            const winners = G.players
+                .map((p,i) => p.hand.length === topScore
+                    ? ctx.playOrder[i]
+                    : undefined)
+                .filter(x => x)
+
+            return {
+                winners
+            }
+        }
     },
     turn: {
         stages: {

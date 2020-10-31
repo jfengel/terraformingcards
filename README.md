@@ -1,6 +1,7 @@
 An online card game, Terraforming Cards
 
-Compile: npx tsc
+Compile: npx tsc (You may have to set noEmit to false in tsconfig.json)
+
 Run server: node -r esm server.js
 
 ## Rules

@@ -1,8 +1,9 @@
 import React, {useState} from 'react';
 import {Card, Cards, GameState, isJoker, PLAYING_ACES, Suit} from "../game";
-import {Ctx} from "boardgame.io";
+import {Ctx, Server} from "boardgame.io";
 import {initials} from "../util/initials";
 import WinnerOverlay from "./WinnerOverlay";
+type PlayerMetadata = Server.PlayerMetadata;
 
 const suitMap = {
     clubs: <span color='black'>♣</span>,
@@ -11,10 +12,12 @@ const suitMap = {
     spades: <span color='black'>♠</span>,
 }
 
-export default ({G, moves, ctx, playerID} : {G : GameState, moves : any, ctx : Ctx, playerID : any}) => {
+export default ({G, moves, ctx, playerID, matchData} :
+    {G : GameState, moves : any, ctx : Ctx, playerID : any, matchData : PlayerMetadata[]}) => {
     const [selectedCard, setSelectedCard] = useState<Card>()
 
-    const player = G.players[ctx.playOrder.indexOf(playerID)];
+    const playerIx = ctx.playOrder.indexOf(playerID);
+    const player = G.players[playerIx];
 
     const playingAces = ctx.activePlayers && ctx.activePlayers[playerID] === PLAYING_ACES;
 
@@ -65,6 +68,8 @@ export default ({G, moves, ctx, playerID} : {G : GameState, moves : any, ctx : C
     else
         classes.push('cardSelected');
 
+    const playerMD = matchData[playerIx];
+
     return <div className={classes.join(' ')}>
         <WinnerOverlay ctx={ctx}/>
         <div>
@@ -97,7 +102,7 @@ export default ({G, moves, ctx, playerID} : {G : GameState, moves : any, ctx : C
             </tbody>
         </table>
         <div>
-            <p>Me ({playerID})</p>
+            <p>Me ({playerMD.name})</p>
             <div className="hand">
                 {player.hand.map((card, i) =>
                     <PlayingCard card={card} key={i}

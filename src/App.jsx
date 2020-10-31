@@ -1,18 +1,17 @@
 import './App.css';
 
-import { Client } from 'boardgame.io/react';
 import game from './game';
 import board from './components/Board'
-import {Local} from "boardgame.io/multiplayer";
 import React from "react";
 
-const multiplayer = Local();
-const View = Client({ game, board, multiplayer})
+import { Lobby } from 'boardgame.io/react';
 
-const App = () => <div>
-    <View playerID="0"/>
-    <View playerID="1"/>
-</div>
+const gameServer = `${window.location.protocol}//${window.location.hostname}:8000`
 
-
-export default App;
+export default () => <Lobby
+    gameServer={gameServer}
+    lobbyServer={gameServer}
+    gameComponents={[
+        { game, board }
+    ]}
+/>;

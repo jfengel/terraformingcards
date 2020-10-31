@@ -128,6 +128,7 @@ function gameOver(G: GameState) {
 }
 
 export default {
+    name: "Mini-Mars",
     setup: (ctx : Ctx) => {
         const deck = [1, 2].flatMap(deck => {
             // Note the missing 10

@@ -12,8 +12,10 @@ const suitMap = {
     spades: <span color='black'>♠</span>,
 }
 
-export default ({G, moves, ctx, playerID, matchData} :
-    {G : GameState, moves : any, ctx : Ctx, playerID : any, matchData : PlayerMetadata[]}) => {
+export default (props : any) => {
+    const {G, moves, ctx, playerID, matchData} :
+        {G : GameState, moves : any, ctx : Ctx, playerID : any, matchData : PlayerMetadata[]} = props;
+    console.info('props', props);
     const [selectedCard, setSelectedCard] = useState<Card>()
 
     const playerIx = ctx.playOrder.indexOf(playerID);
@@ -76,7 +78,9 @@ export default ({G, moves, ctx, playerID, matchData} :
             Cards remaining: {G.supply.length}
         </div>
         <div>
-            Current player: {ctx.currentPlayer}
+            Now playing: {
+            matchData[ctx.playOrder.indexOf(ctx.currentPlayer)].name
+        }
         </div>
         <table>
             <tbody>

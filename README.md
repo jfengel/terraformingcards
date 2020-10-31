@@ -1,5 +1,8 @@
 An online card game, Terraforming Cards
 
+Compile: npx tsc
+Run server: node -r esm server.js
+
 ## Rules
 A 10-15 minute TM game for 2-7 players designed by me!
 

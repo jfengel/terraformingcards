@@ -16,12 +16,12 @@ const suitMap = {
 export default (props: any) => {
     const {G, moves, ctx, playerID, matchData, log}:
         {
-            G: GameState, moves: any, ctx: Ctx, playerID: any, matchData: PlayerMetadata[],
+            G: GameState, moves: any, ctx: Ctx, playerID: PlayerID, matchData: PlayerMetadata[],
             log: LogEntry[]
         } = props;
     const [selectedCard, setSelectedCard] = useState<Card>()
 
-    const playerIx = ctx.playOrder.indexOf(playerID);
+    const playerIx = matchData.findIndex(md => ""+md.id === playerID);
     const player = G.players[playerIx];
 
     const playingAces = ctx.activePlayers && ctx.activePlayers[playerID] === PLAYING_ACES;
@@ -50,7 +50,8 @@ export default (props: any) => {
               onClick={onClick && (_ => onClick(card))}>
             {card.value}
             {card.suit && suitMap[card.suit]}
-            {card.value === 'K' ? <sup>{initials((card as any).player, ctx.playOrder)}</sup> : null}
+            {card.value === 'K' ? <sup>{initials((card as any).player,
+                matchData.map((md, i) => md.name || ""+i))}</sup> : null}
     </span>
 
     const Pile = ({cards, suit}: { cards: Cards, suit: Suit }) =>
@@ -76,7 +77,8 @@ export default (props: any) => {
     const playerMD = matchData[playerIx];
 
     const playerName = (id : PlayerID) =>
-        matchData[ctx.playOrder.indexOf(id)].name
+        matchData.find(p => ""+p.id === id)?.name
+
 
     return <div className={classes.join(' ')}>
         <WinnerOverlay ctx={ctx}/>
@@ -142,6 +144,7 @@ export default (props: any) => {
                         {playerName(entry.action.payload.playerID)}:
                         <PlayingCard card={entry.action.payload.args[0]}/>
                     </div>)
+                    .reverse()
                 }
             </div>
             </div>

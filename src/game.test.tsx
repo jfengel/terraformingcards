@@ -129,17 +129,18 @@ it('should distribute kings', () => {
     expect(client2.store.getState().ctx.gameover).toBeFalsy();
 
     client2.moves.play(c(9,C,1))
+    const G = client2.store.getState().G;
     expect(client1.store.getState().ctx.gameover.winners.length).toBe(1);
     expect(client2.store.getState().ctx.gameover.winners[0]).toBe("1");
-    expect(client2.store.getState().G.players[0].hand.length).toBe(15);
-    expect(client2.store.getState().G.players[1].hand.length).toBe(16);
+    expect(client2.store.getState().ctx.gameover.finalScores).toStrictEqual([13, 15]);
+    expect(G.supply.length).toBe(27);
     expect(client1.store.getState().G.tableau.clubs.available.length).toBe(0)
 })
 
 
 const C = Suit.Clubs;
-const H = Suit.Hearts;
-const D = Suit.Diamonds;
-const S = Suit.Spades;
+// const H = Suit.Hearts;
+// const D = Suit.Diamonds;
+// const S = Suit.Spades;
 
 const c = (value : string | number, suit : Suit, deck = 0) => ({value, suit, deck});

@@ -94,8 +94,8 @@ export const playCard = (G : GameState, ctx : Ctx, card : Card) => {
     }
 };
 
-export function distributeKings(t:
-                                    Tableau, ctx: Ctx, G: GameState) {
+export function distributeKings(t: Tableau, ctx: Ctx) : number[] {
+    const extraCards = Array(ctx.playOrder.length).fill(0)
     // At the end of the game, any previous cards between the king and the seed 10 (or a previous king)
     // go into the king's owner's hand.
     for (const suit of [t.clubs, t.diamonds, t.hearts, t.spades]) {
@@ -106,18 +106,15 @@ export function distributeKings(t:
                 const player = suit.pile[secondKing].player;
                 const i = ctx.playOrder.indexOf(player!);
                 const betweenKings2 = suit.pile.filter((_,i) => i > firstKing && i < secondKing)
-                G.players[i].hand.push(...betweenKings2);
+                extraCards[i] += betweenKings2.length;
             }
             const player = suit.pile[firstKing].player;
             const i = ctx.playOrder.indexOf(player!);
             const betweenKings1 = suit.pile.filter((_,i) => i > 0 && i < firstKing)
-            G.players[i].hand.push(...betweenKings1);
-            // For some reason splice wasn't working on suit.pile
-            // This doesn't work either. I can modify the players but not the suits. Weird.
-            // It's not important to the final state of the game but it's odd.
-            // suit.pile = suit.pile.filter((_,i) => i === 0 || i === firstKing || (secondKing > 0 && i >= secondKing ))
+            extraCards[i] += betweenKings1.length;
         }
     }
+    return extraCards;
 }
 
 function gameOver(G: GameState) {
@@ -161,18 +158,21 @@ export default {
     },
     endIf: (G : GameState, ctx : Ctx) => {
         const t = G.tableau;
-        // When the last playout deck runs out, finish the draw, if any, from the supply and the game ends.
+        // When the last playout deck runs out ... the game ends.
         if(gameOver(G)) {
-            distributeKings(t, ctx, G);
-            const topScore = Math.max(...G.players.map(x => x.hand.length));
-            const winners = G.players
-                .map((p,i) => p.hand.length === topScore
+            const extraCards = distributeKings(t, ctx);
+            let finalScores = G.players.map((x, i) => x.hand.length + extraCards[i]);
+            const topScore = Math.max(...finalScores);
+            const winners = finalScores
+                .map((score,i) => score === topScore
                     ? ctx.playOrder[i]
                     : undefined)
                 .filter(x => x)
 
             return {
-                winners
+                winners,
+                finalScores,
+                extraCards
             }
         }
     },

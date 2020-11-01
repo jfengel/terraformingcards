@@ -6,7 +6,9 @@ import React from "react";
 
 import { Lobby } from 'boardgame.io/react';
 
-const gameServer = `${window.location.protocol}//${window.location.hostname}:8000`
+const {protocol, hostname, port} = window.location;
+
+const gameServer = `${protocol}//${hostname}:${port}`
 
 export default () => <Lobby
     gameServer={gameServer}

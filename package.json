@@ -12,15 +12,18 @@
     "@types/react-dom": "^16.9.0",
     "boardgame.io": "^0.41.1",
     "esm": "^3.2.25",
+    "koa-static": "^5.0.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "react-scripts": "3.4.3"
+    "react-scripts": "3.4.3",
+    "serve": "^11.3.2"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start:built": "yarn serve -s build",
+    "start:dev": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "start-server": "npx ts-node src/server.ts",
+    "start": "npx ts-node src/server.ts",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -39,6 +42,7 @@
     ]
   },
   "devDependencies": {
+    "@types/koa-static": "^4.0.1",
     "nodemon": "^2.0.6",
     "ts-node": "^9.0.0",
     "typescript": "^4.0.5"

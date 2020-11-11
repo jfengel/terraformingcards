@@ -129,12 +129,13 @@ it('should distribute kings', () => {
     expect(client2.store.getState().ctx.gameover).toBeFalsy();
 
     client2.moves.play(c(9,C,1))
-    const G = client2.store.getState().G;
+    const G = client2.store.getState().G as GameState;
     expect(client1.store.getState().ctx.gameover.winners.length).toBe(1);
     expect(client2.store.getState().ctx.gameover.winners[0]).toBe("1");
     expect(client2.store.getState().ctx.gameover.finalScores).toStrictEqual([13, 15]);
     expect(G.supply.length).toBe(27);
     expect(client1.store.getState().G.tableau.clubs.available.length).toBe(0)
+    expect(G.tableau.clubs.pile.length).toBe(4);    // The 10, the two kings, and the final 9
 })
 
 

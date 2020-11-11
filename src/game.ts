@@ -94,8 +94,8 @@ export const playCard = (G : GameState, ctx : Ctx, card : Card) => {
     }
 };
 
-export function distributeKings(t: Tableau, ctx: Ctx) : number[] {
-    const extraCards = Array(ctx.playOrder.length).fill(0)
+export function distributeKings(G : GameState, ctx: Ctx) {
+    const t = G.tableau;
     // At the end of the game, any previous cards between the king and the seed 10 (or a previous king)
     // go into the king's owner's hand.
     for (const suit of [t.clubs, t.diamonds, t.hearts, t.spades]) {
@@ -103,18 +103,17 @@ export function distributeKings(t: Tableau, ctx: Ctx) : number[] {
         if (firstKing > 0) {
             const secondKing = suit.pile.findIndex((card, i) => i > firstKing && card.value === 'K');
             if (secondKing > 0) {
-                const player = suit.pile[secondKing].player;
-                const i = ctx.playOrder.indexOf(player!);
-                const betweenKings2 = suit.pile.filter((_,i) => i > firstKing && i < secondKing)
-                extraCards[i] += betweenKings2.length;
+                const owner = suit.pile[secondKing].player!
+                const i = ctx.playOrder.indexOf(owner!);
+                const cards = suit.pile.splice(firstKing+1, secondKing-firstKing-1);
+                G.players[i].hand.push(...cards)
             }
-            const player = suit.pile[firstKing].player;
-            const i = ctx.playOrder.indexOf(player!);
-            const betweenKings1 = suit.pile.filter((_,i) => i > 0 && i < firstKing)
-            extraCards[i] += betweenKings1.length;
+            const player = suit.pile[firstKing].player!;
+            const i = ctx.playOrder.indexOf(player);
+            const cards = suit.pile.splice(1, firstKing-1);
+            G.players[i].hand.push(...cards)
         }
     }
-    return extraCards;
 }
 
 function gameOver(G: GameState) {
@@ -157,11 +156,9 @@ export default {
             tableau};
     },
     endIf: (G : GameState, ctx : Ctx) => {
-        const t = G.tableau;
         // When the last playout deck runs out ... the game ends.
         if(gameOver(G)) {
-            const extraCards = distributeKings(t, ctx);
-            let finalScores = G.players.map((x, i) => x.hand.length + extraCards[i]);
+            let finalScores = G.players.map((x) => x.hand.length);
             const topScore = Math.max(...finalScores);
             const winners = finalScores
                 .map((score,i) => score === topScore
@@ -171,8 +168,7 @@ export default {
 
             return {
                 winners,
-                finalScores,
-                extraCards
+                finalScores
             }
         }
     },
@@ -182,6 +178,11 @@ export default {
                 moves: { playCard },
             },
         },
+        onEnd: (G : GameState, ctx : Ctx) => {
+            if(gameOver(G)) {
+                distributeKings(G, ctx)
+            }
+        }
     },
 
     moves: {

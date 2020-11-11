@@ -3,8 +3,13 @@ import {Card, Cards, GameState, isJoker, PLAYING_ACES, Suit} from "../game";
 import {Ctx, LogEntry, PlayerID, Server} from "boardgame.io";
 import {initials} from "../util/initials";
 import WinnerOverlay from "./WinnerOverlay";
+import { MatchContext } from './matchcontext';
 
 type PlayerMetadata = Server.PlayerMetadata;
+
+export const playerName = (id : PlayerID, matchData : PlayerMetadata[]) =>
+    matchData.find(p => ""+p.id === id)?.name
+
 
 const suitMap = {
     clubs: <span color='black'>♣</span>,
@@ -73,14 +78,12 @@ export default (props: any) => {
         classes.push('jackOrQueenSelected noCardSelected')
     else
         classes.push('cardSelected');
+    classes.push("terraformingmars");
 
     const playerMD = matchData[playerIx];
 
-    const playerName = (id : PlayerID) =>
-        matchData.find(p => ""+p.id === id)?.name
-
-
     return <div className={classes.join(' ')}>
+        <MatchContext.Provider value={matchData}>
         <WinnerOverlay ctx={ctx}/>
         <div className="gameBoard">
 
@@ -134,14 +137,14 @@ export default (props: any) => {
                     Cards remaining: {G.supply.length}
                 </div>
                 <div>
-                    Now playing: {playerName(ctx.currentPlayer)}
+                    Now playing: {playerName(ctx.currentPlayer, matchData)}
                 </div>
                 Past moves:
                 {log
                     .filter(entry => entry.action.type === "MAKE_MOVE"
                         && entry.action.payload.type === "play")
                     .map((entry, i) => <div key={i}>
-                        {playerName(entry.action.payload.playerID)}:
+                        {playerName(entry.action.payload.playerID, matchData)}:
                         <PlayingCard card={entry.action.payload.args[0]}/>
                     </div>)
                     .reverse()
@@ -152,6 +155,6 @@ export default (props: any) => {
 
 
 
-
+        </MatchContext.Provider>
     </div>
 }

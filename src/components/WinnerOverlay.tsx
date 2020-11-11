@@ -1,11 +1,16 @@
 import React from "react";
-import {Ctx} from "boardgame.io";
+import {Ctx, PlayerID, Server} from "boardgame.io";
+import {MatchContext} from "./matchcontext";
+import {playerName} from "./Board";
 
-export function winnerText(winners : string[], numPlayers : number) {
+type PlayerMetadata = Server.PlayerMetadata;
+
+export function winnerText(winnerIds : PlayerID[], matchData : PlayerMetadata[]) {
+    const winners = winnerIds.map(x => playerName(x, matchData))
     let text;
     if (winners.length === 1) {
         text = winners[0] + " wins!"
-    } else if (winners.length === numPlayers) {
+    } else if (winners.length === matchData.length) {
         text = "Everybody ties!"
     } else if (winners.length === 2) {
         text = winners[0] + " and " + winners[1] + " win!"
@@ -25,6 +30,10 @@ export default ({ctx} : {ctx : Ctx}) => {
         return null;
     }
     return <div className="winnerOverlay">
-        {winnerText(ctx.gameover.winners, ctx.playOrder.length)}
+        <MatchContext.Consumer>{
+            (matchData) =>
+                winnerText(ctx.gameover.winners, matchData)
+        }</MatchContext.Consumer>
+
     </div>
 }

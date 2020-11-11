@@ -18,6 +18,25 @@ const suitMap = {
     spades: <span color='black'>♠</span>,
 }
 
+function logEntry(entry: LogEntry,
+                  matchData: PlayerMetadata[],
+                  PlayingCard: ({card, onClick}: { card: Card; onClick?: (_: Card) => void }) => JSX.Element) {
+    switch (entry.action.payload.type) {
+        case "play":
+            return <>
+                {playerName(entry.action.payload.playerID, matchData)}:
+                <PlayingCard card={entry.action.payload.args[0]}/>
+            </>;
+        case "playJoker":
+            return <>
+                {playerName(entry.action.payload.playerID, matchData)}:
+                <PlayingCard card={entry.action.payload.args[0]}/>
+                &nbsp;on&nbsp;
+                <PlayingCard card={entry.action.payload.args[1]}/>
+            </>;
+    }
+}
+
 export default (props: any) => {
     const {G, moves, ctx, playerID, matchData, log}:
         {
@@ -142,11 +161,11 @@ export default (props: any) => {
                 Past moves:
                 {log
                     .filter(entry => entry.action.type === "MAKE_MOVE"
-                        && entry.action.payload.type === "play")
-                    .map((entry, i) => <div key={i}>
-                        {playerName(entry.action.payload.playerID, matchData)}:
-                        <PlayingCard card={entry.action.payload.args[0]}/>
-                    </div>)
+                        && entry.action.payload.type.startsWith("play"))
+                    .map((entry, i) =>
+                        <div key={i}>
+                            {logEntry(entry, matchData, PlayingCard)}
+                        </div>)
                     .reverse()
                 }
             </div>

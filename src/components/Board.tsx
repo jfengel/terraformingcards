@@ -7,8 +7,12 @@ import { MatchContext } from './matchcontext';
 
 type PlayerMetadata = Server.PlayerMetadata;
 
+const toPlayerId = (x : number) : PlayerID => {
+    return "" + x;
+}
+
 export const playerName = (id : PlayerID, matchData : PlayerMetadata[]) =>
-    matchData.find(p => ""+p.id === id)?.name
+    matchData.find(p => toPlayerId(p.id) === id)?.name
 
 
 const suitMap = {
@@ -37,12 +41,70 @@ function logEntry(entry: LogEntry,
     }
 }
 
+const _ = null;
+
+/** How to lay players out clockwise, with ourselves at the bottom.
+ * Line up all of the players in order after you, circularly.
+ * So if there are 4 players ("0", "1", "2, "3"), and you are player
+ * "2", player "3" will be assigned 0, "0"->1, and "1" -> 2.
+ * Pick the Nth row, where N is the number of players.
+ * The row represents 2 rows of 3 cells each. The tableau goes in the center
+ * of the bottom row.
+ * So for 4 players, thw row is [[_,1,_],[0,_,2]], so the positions are:
+ *
+ * [blank]   [1 : "0"] [blank]
+ * [0 : "3"] [Tableau] [2 : "1"]
+ *
+ * And yes, this was the easiest way I could think of to do it. The
+ * use of "1", "2", "3", is ot my fault.
+ *
+ * The game rules allow for 7 players, and this only supports 6. A new row
+ * can be added to support 7.
+ */
+const playerLayout = [
+    null,
+    null,
+    [[_,0,_],[_,_,_]],
+    [[0,_,1],[_,_,_]],
+    [[_,1,_],[0,_,2]],
+    [[1,2,_],[0,_,3]],
+    [[1,2,3],[0,_,4]],
+]
+
+const OtherPlayer = ({row, col, G, matchData, playerID} :
+                         {row : number, col : number,
+                             matchData : PlayerMetadata[],
+                             playerID : PlayerID,
+                             G : GameState }) => {
+    const playerIDs = matchData.map(x => toPlayerId(x.id));
+    const circle = [...playerIDs, ...playerIDs];
+    const meIx = circle.indexOf(playerID);
+    circle.splice(0, meIx+1);
+
+    const layout = playerLayout[matchData.length];
+    if(!layout) {
+        return null;
+    }
+    const px = layout[row][col];
+    if(px === null) {
+         return null;
+    }
+    const otherPID = circle[px]
+    const otherPIx = matchData.findIndex(x => toPlayerId(x.id) === otherPID)!
+
+    return <div className="otherPlayer">
+        <span className="playerName">{matchData[otherPIx].name}</span><br/>
+        {JSON.stringify(G.players[otherPIx].hand.length)}🂠<br/>
+    </div>;
+}
+
 export default (props: any) => {
     const {G, moves, ctx, playerID, matchData, log}:
         {
             G: GameState, moves: any, ctx: Ctx, playerID: PlayerID, matchData: PlayerMetadata[],
             log: LogEntry[]
         } = props;
+
     const [selectedCard, setSelectedCard] = useState<Card>()
 
     const playerIx = matchData.findIndex(md => ""+md.id === playerID);
@@ -110,13 +172,14 @@ export default (props: any) => {
                 <table>
                     <tbody>
                     <tr>
-                        <td/>
-                        <td/>
-                        <td/>
+                        <td><OtherPlayer row={0} col={0} {...{G, ctx, matchData, playerID}}/></td>
+                        <td><OtherPlayer row={0} col={1} {...{G, ctx, matchData, playerID}}/></td>
+                        <td><OtherPlayer row={0} col={2} {...{G, ctx, matchData, playerID}}/></td>
                     </tr>
                     <tr>
                         <td/>
                         <td>
+                            <>
                             <Pile suit={Suit.Clubs} cards={G.tableau.clubs}/>
                             <Pile suit={Suit.Diamonds} cards={G.tableau.diamonds}/>
                             <Pile suit={Suit.Hearts} cards={G.tableau.hearts}/>
@@ -125,6 +188,7 @@ export default (props: any) => {
                                 :
                                 {player.special.map((card, i) => <PlayingCard card={card} key={i}/>)}
                             </div>
+                                </>
                         </td>
                         <td/>
                     </tr>

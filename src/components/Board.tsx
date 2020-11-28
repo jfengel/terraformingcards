@@ -1,9 +1,9 @@
 import React, {useState} from 'react';
 import {Card, Cards, GameState, isJoker, PLAYING_ACES, Suit} from "../game";
 import {Ctx, LogEntry, PlayerID, Server} from "boardgame.io";
-import {initials} from "../util/initials";
 import WinnerOverlay from "./WinnerOverlay";
 import { MatchContext } from './matchcontext';
+import PlayingCard from "./PlayingCard";
 
 type PlayerMetadata = Server.PlayerMetadata;
 
@@ -13,14 +13,6 @@ const toPlayerId = (x : number) : PlayerID => {
 
 export const playerName = (id : PlayerID, matchData : PlayerMetadata[]) =>
     matchData.find(p => toPlayerId(p.id) === id)?.name
-
-
-const suitMap = {
-    clubs: <span color='black'>♣</span>,
-    diamonds: <span style={{color: 'red'}}>♦</span>,
-    hearts: <span style={{color: 'red'}}>♥</span>,
-    spades: <span color='black'>♠</span>,
-}
 
 function logEntry(entry: LogEntry,
                   matchData: PlayerMetadata[],
@@ -94,7 +86,11 @@ const OtherPlayer = ({row, col, G, matchData, playerID} :
 
     return <div className="otherPlayer">
         <span className="playerName">{matchData[otherPIx].name}</span><br/>
-        {JSON.stringify(G.players[otherPIx].hand.length)}🂠<br/>
+        {G.players[otherPIx].hand.length}🂠<br/>
+        <div className="otherPlayerJacksAndQueens">
+            {G.players[otherPIx].special.map((card, i) =>
+                <PlayingCard key={i} {...{card}}/>)}
+        </div>
     </div>;
 }
 
@@ -126,26 +122,13 @@ export default (props: any) => {
         setSelectedCard(undefined)
     }
 
-    const PlayingCard = ({card, onClick}: {
-        card: Card,
-        onClick?: (_: Card) => void
-    }) =>
-        <span className={"card"
-        + (onClick ? " selectable" : "")
-        + ((selectedCard && selectedCard === card) ? " selectedCard" : "")}
-              onClick={onClick && (_ => onClick(card))}>
-            {card.value}
-            {card.suit && suitMap[card.suit]}
-            {card.value === 'K' ? <sup>{initials((card as any).player,
-                matchData.map((md, i) => md.name || ""+i))}</sup> : null}
-    </span>
-
     const Pile = ({cards, suit}: { cards: Cards, suit: Suit }) =>
         <div>
             {cards.available.length}🂠&nbsp;
             {cards.pile.map((card, i) =>
                 <PlayingCard card={card}
                              key={i}
+                             matchData={matchData}
                              onClick={isJoker(selectedCard) ? remove : undefined}/>)}
             {selectedCard && selectedCard.suit === suit
                 ? <span className={"destination"} onClick={play(suit)}>:</span>
@@ -199,6 +182,7 @@ export default (props: any) => {
                     <div className="hand">
                         {player.hand.map((card, i) =>
                             <PlayingCard card={card} key={i}
+                                         selectedCard={selectedCard}
                                 // If the playout deck runs out, you may complete your draw, if any, from the supply.
                                 // No more numeric cards of that suite may be played.
                                          onClick={

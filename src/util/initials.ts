@@ -1,6 +1,8 @@
 /* Apply several strategies to come up with a short, unique identifier */
-export const initials = (name: string, allNames: string[]) => {
+export const initials = (name: string, allNames?: string[]) => {
     if (!name)
+        return name;
+    if(!allNames)
         return name;
     const others = allNames.filter(x => name !== x);
     const first = (x: string) => x[0];

@@ -42,7 +42,9 @@
   min-width: 100px;
   display: inline-block;
 }
-
+.otherPlayerJacksAndQueens {
+  min-height: 1em;
+}
 .jackOrQueenSelected .jacksAndQueens {
   background-color: yellow;
 }
